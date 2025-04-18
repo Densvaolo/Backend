@@ -29,6 +29,7 @@ namespace WebApi.Data.Repositories
         public virtual async Task<IEnumerable<TEntity>> GetAllAsync()
         {
             var entities = await _table.ToListAsync();
+          
             return entities;
         }
         

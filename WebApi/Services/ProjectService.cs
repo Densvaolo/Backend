@@ -10,7 +10,7 @@ namespace WebApi.Services
         private readonly ProjectRepository _projectRepository = projectRepository;
 
 
-        public async Task<bool> CreateProjectAsync(AddProjectFormData  projectFormData)
+        public async Task<bool> CreateProjectAsync(AddProjectFormData projectFormData)
         {
             if (projectFormData == null)
                 return false;
@@ -27,7 +27,7 @@ namespace WebApi.Services
                 UserId = projectFormData.UserId,
                 StatusId = 1,
             };
-            
+
             var result = await _projectRepository.AddAsync(entity);
             return result;
         }
@@ -36,6 +36,10 @@ namespace WebApi.Services
         public async Task<IEnumerable<Project>> GetAllProjectsAsync(bool orderByDescending = false)
         {
             var entities = await _projectRepository.GetAllAsync();
+
+            if (orderByDescending)
+                entities = entities.OrderByDescending(p => p.Created);
+
             var projects = entities.Select(entity => new Project
             {
                 Id = entity.Id,
@@ -50,26 +54,20 @@ namespace WebApi.Services
                     Id = entity.Client.Id,
                     ClientName = entity.Client.ClientName
                 },
-
                 User = new User
                 {
                     Id = entity.User.Id,
                     FirstName = entity.User.FirstName,
                     LastName = entity.User.LastName
                 },
-
                 Status = new Status
                 {
                     Id = entity.Status.Id,
                     StatusName = entity.Status.StatusName
                 }
-
             });
 
-
-            return orderByDescending
-                ? projects.OrderByDescending(entity => entity.Created) 
-                : projects.OrderBy(entity => entity.Created);
+            return projects;
         }
 
         public async Task<Project?> GetProjectByIdAsync(string projectId)
@@ -126,15 +124,16 @@ namespace WebApi.Services
         }
 
 
-        public async Task <bool> DeleteProjectAsync(string projectId)
+        public async Task<bool> DeleteProjectAsync(string projectId)
         {
             if (string.IsNullOrEmpty(projectId))
                 return false;
 
-            var result = await _projectRepository.DeleteAsync ( x => x.Id == projectId);
+            var result = await _projectRepository.DeleteAsync(x => x.Id == projectId);
             return result;
         }
 
 
 
+    }
 }

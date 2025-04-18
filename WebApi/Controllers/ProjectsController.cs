@@ -37,17 +37,17 @@ namespace WebApi.Controllers
             return project == null ? NotFound() : Ok(project); 
         }
 
-        [HttpPut]
-        public async Task<IActionResult> Update(UpdateProjectFormData projectFormData)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(string id, [FromBody] UpdateProjectFormData projectFormData)
         {
-            if(!ModelState.IsValid)
-                return BadRequest(projectFormData);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState); 
+
+            projectFormData.Id = id;
 
             var result = await _projectService.UpdateProjectAsync(projectFormData);
             return result ? Ok() : NotFound("Project not found");
-
         }
-
 
 
         [HttpDelete ("{projectId}")]
